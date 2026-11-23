@@ -40,11 +40,14 @@ numbers <- 1:10
 summary_stats <- list(mean, median, sd, var)
 ```
 
-- [ ] Calculate the mean of each vector in `list_of_vectors`.
-- [ ] For each statistic in `summary_stats`, apply the statistic to `numbers`.
+- [x] Calculate the mean of each vector in `list_of_vectors`.
+- [x] For each statistic in `summary_stats`, apply the statistic to `numbers`.
 
 ::: {.solution}
-
+```{r}
+map_dbl(list_of_vectors, mean)
+map_dbl(summary_stats, function(f) f(numbers))
+```
 :::
 
 Next we use `pmap` to draw several plots of the penguins at once.
@@ -58,7 +61,9 @@ variables <- c("flipper_length_mm", "bill_length_mm", "bill_depth_mm")
 - [ ] Create a vector of titles and add them to your plot.
 
 ::: {.solution}
-
+```{r}
+titles <- map_chr(variables, function(x), paste0)
+```
 :::
 
 Finally, we replace a loop with `map`.
@@ -95,7 +100,14 @@ loop_results
 ```
 
 ::: {.solution}
+```{r}
+by_species <- split(penguins, penguins$species)
 
+results <- by_split(map(function(data) {
+  model <- lm(bill_depth_mm ~ bill-length_mm, data = data)
+  coefficients(tidy(model))
+}))
+```
 :::
 
 - [ ] A refactor should change how the code is organised, without changing what it does. Check that your version gives the same results as the loop. If it doesn't, why not?
@@ -112,19 +124,30 @@ The folder `data/penguins` contains the penguins data as one CSV file per specie
 - [ ] Read all of the CSV files in `data/penguins` into a single tibble, with a column recording which file each row came from. Look at what is in the folder first. (*Hint*: see *Working with Lists of Results* in the [Week 9 notes](https://soton-fds.github.io/week09.html); `set_names()` will help you keep track of which file is which.)
 
 ::: {.solution}
-
+```{r}
+files <- list.files("data/penguins", pattern = "\\.csv$", full.names = TRUE)
+complete_data <- files |> 
+  set_names() |>
+  map(read.csv) |> 
+  list_rbind(names_to = "file")
+complete_data
+```
 :::
 
 - [ ] Use `fit_bill_model()` from Task 1 to fit a separate line of bill depth against bill length for each file. Your code should fail. Which file causes the problem, and why?
 
 ::: {.solution}
-
+```{r}
+fit_bill_model()
+```
 :::
 
 - [ ] Change your code so that a file that cannot be fitted no longer stops the others. Check which files failed, and combine the results for the others into a single tibble.
 
 ::: {.solution}
+```{r}
 
+```
 :::
 
 - [ ] Is it reasonable simply to leave out the file that failed? What would you report alongside these results?
